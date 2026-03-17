@@ -1,21 +1,8 @@
-from __future__ import annotations
+import logging
 
-script = str.maketrans("0123456789-.", "⁰¹²³⁴⁵⁶⁷⁸⁹⁻·" ) # unicode para potências e raízes
-
-# Formatações
-
-# Transforma números em índices
-def translate(n):
-    return str(n).translate(script)
-
-# Transforma números em índices
-def format_index(i) -> str:
-    if i == 2: 
-        return "√" # símbolo padrão de raíz quadrada
-    else:
-        return f"{translate(i)}√" # impressão com índice formatado
+logger = logging.getLogger(__name__)
     
-def fmt(n: float, decimals: int = 10):
+def fmt(n: float, decimals: int = 10) -> str:
     if abs(n) < 1e-12: # número muito pequeno = 0
         n = 0.0
 
@@ -25,4 +12,9 @@ def fmt(n: float, decimals: int = 10):
         return str(int(n)) # retorna str agora do tipo 1, em int
     
     s = f"{n:.{decimals}f}".rstrip("0").rstrip(".") # formata decimais, e tira zeros a direita da vírgula.
+    
+    logger.debug("Número formatado: %s", s)
     return s
+
+def separator():
+    print("-" * 40)

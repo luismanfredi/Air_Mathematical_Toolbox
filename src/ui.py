@@ -1,13 +1,16 @@
 from typing import Optional, List
+import logging
 
-from src.formatting import fmt
+from src.formatting import fmt, separator
 from src.parsing import parse_number, parse_op
 from src.engine import apply_binary, apply_unary
 
+logger = logging.getLogger(__name__)
 
 # Imprime ajuda para o usuário
 def help_airscal() -> None:
-    print("-" * 40)
+    logger.info("Menu de ajuda a mostra")
+    separator()
     print(      
         "Air v0 - Help\n"
         "Commands:\n"
@@ -25,7 +28,8 @@ def help_airscal() -> None:
 
 # Mostra histórico ao usuário em forma de lista, com máximo de 10 operações
 def show_history(history: List[str], limit: int = 10) -> None:
-    print("-" * 40)
+    logger.info("Histórico a mostra")
+    separator()
     print("History:")
     if not history: # caso histórico esteja vazio
         print("  (empty)")
@@ -35,7 +39,8 @@ def show_history(history: List[str], limit: int = 10) -> None:
 
 # Air Simple Calculator
 def airscal() -> None:
-    print("-" * 40)
+    logger.info("Calculadora começando...")
+    separator()
     print(
         "Welcome to the Air Simple Calculator!\n"
         "This is a simple calculator with the four basic operations, plus square roots and exponentiation.\n"
@@ -58,13 +63,12 @@ def airscal() -> None:
         # Caso seja esteja rodando pela primeira vez, ou clear for usado
         if current_value is None:
             while True:
-                ''' 
-                Processo ultilizado nos dois números e na operação
-                associa o valor de kind a um Token e payload ao conteúdo
-                chama a função com o parse do que o usuário deve digitar, nesse caso parse_number
-                ans=None já que essa é a primeira operação
-                '''
-                print("-" * 40)
+                # Processo ultilizado nos dois números e na operação
+                # associa o valor de kind a um Token e payload ao conteúdo
+                # chama a função com o parse do que o usuário deve digitar, nesse caso parse_number
+                # ans=None já que essa é a primeira operação
+            
+                separator()
                 kind, payload = parse_number(input("Num: "), ans=None) # associa o valor de kind a um Token e payload ao conteúdo
                 if kind == "NUMBER":
                     current_value = float(payload) # current_value = número digitado pelo usuário
@@ -75,25 +79,27 @@ def airscal() -> None:
                 if kind == "COMMAND": 
                     cmd = str(payload) 
                     if cmd == "QUIT":
-                        print("-" * 40)
+                        logger.info("Aplicação encerrada")
+                        separator()
                         print("Thank you for using Air Simple Calculator!")
                         return
                     if cmd == "HELP":
                         help_airscal()
                         continue
                     if cmd == "CLEAR": # já estamos sem um valor, apenas volta ao início do loop
+                        logger.info("Calcudora limpa")
                         continue
                     if cmd == "HISTORY":
                         show_history(history)
                         continue
 
                 # Input inválido
-                print("-" * 40)
+                separator()
                 print("Attention! Enter a real number or a command (h for help).")
  
         # Pedir operação
         while True:
-            print("-" * 40)
+            separator()
             # Mesmo processo de antes, porém com parse_op dessa vez
             kind, payload = parse_op(input("Op: "))
             
@@ -107,7 +113,8 @@ def airscal() -> None:
             if kind == "COMMAND":
                 cmd = str(payload)
                 if cmd == "QUIT":
-                    print("-" * 40)
+                    logger.info("Aplicação encerrada")
+                    separator()
                     print("Thank you for using Air Simple Calculator!")
                     return
                 if cmd == "HELP":
@@ -121,7 +128,7 @@ def airscal() -> None:
                     continue
             
             # Operador inválido
-            print("-" * 40)
+            separator()
             print("Attention! Invalid Operator. Use h for help.")
 
         # Se o comando for clear
@@ -132,7 +139,7 @@ def airscal() -> None:
             # Se a operação for unária
             if op_kind == "UNARY_OP":
                 print(f"{op_name}{fmt(current_value)}")
-                print("-" * 40)
+                separator()
                 before = current_value # armazenamos o valor pois ele será alterado na próxima linha
                 current_value = apply_unary(op_name, current_value) # operação aplicada
                 line = f"{op_name}({fmt(before)}) = {fmt(current_value)}"
@@ -142,7 +149,7 @@ def airscal() -> None:
 
             while True:
                 print(f"{fmt(current_value)} {op_name}")
-                print("-" * 40)
+                separator()
 
                 # Pedir o segundo número
                 kind, payload = parse_number(input("Num: "), ans=current_value) # ans será o resultado anterior
@@ -154,7 +161,8 @@ def airscal() -> None:
                 if kind == "COMMAND":
                     cmd = str(payload)
                     if cmd == "QUIT":
-                        print("-" * 40)
+                        logger.info("Aplicação encerrada")
+                        separator()
                         print("Thank you for using Air Simple Calculator!")
                         return
                     if cmd == "HELP":
@@ -168,11 +176,12 @@ def airscal() -> None:
                         continue
 
                 # Input inválido
-                print("-" * 40)
+                
                 print("Attention! Invalid number. Use h for help.")
 
             # Se o comando for clear
             if current_value is None:
+                logger.info("Calcudora limpa")
                 continue
             
             # Execução da operação binária
@@ -183,10 +192,10 @@ def airscal() -> None:
             print(line)
 
         except ZeroDivisionError:
-            print("-" * 40)
+            logger.warning("Erro de divisão por zero")
             print("Attention! Can't divide by zero.")
         
         # Caso erro genérico
         except ValueError as e:
-            print("-" * 40)
+            logger.exception("Erro inesperado na aplicação")
             print(f"Attention! {e}")
