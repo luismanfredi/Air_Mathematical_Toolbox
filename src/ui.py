@@ -4,6 +4,7 @@ import logging
 from src.formatting import fmt, separator
 from src.parsing import parse_number, parse_op
 from src.engine import apply_binary, apply_unary
+import src.tokenizer as tokenizer 
 
 logger = logging.getLogger(__name__)
 
@@ -199,3 +200,14 @@ def airscal() -> None:
         except ValueError as e:
             logger.exception("Erro inesperado na aplicação")
             print(f"Attention! {e}")
+
+def scicalculator():
+
+    while True:
+        expr = input("Expr: ")
+        result, error = tokenizer.run(expr)
+
+        if error:
+            print(error.as_string())  
+        else:
+            print(result)
